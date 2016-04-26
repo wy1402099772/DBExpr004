@@ -77,7 +77,16 @@
     
     [self.bottomView addSubview:self.cancelButton];
     [self.cancelButton mas_makeConstraints:^(MASConstraintMaker *make){
-        make.center.equalTo(self.bottomView);
+        make.left.equalTo(self.view).offset(15);
+        make.centerY.equalTo(self.bottomView);
+        make.height.mas_equalTo(50);
+        make.width.mas_equalTo(100);
+    }];
+    
+    [self.bottomView addSubview:self.modifyButton];
+    [self.modifyButton mas_makeConstraints:^(MASConstraintMaker *make){
+        make.right.equalTo(self.view).offset(-15);
+        make.centerY.equalTo(self.bottomView);
         make.height.mas_equalTo(50);
         make.width.mas_equalTo(100);
     }];
@@ -200,6 +209,8 @@
 
 - (void)fillData
 {
+    if(self.detailType != DetailTypeEdit)
+        return ;
     self.titleText.text = self.model.title;
     self.authorText.text = self.model.author;
     self.yearText.text = self.model.year;
@@ -216,12 +227,12 @@
 
 - (void)modifyAction:(UIButton *)sender
 {
-    NSString *title = @"C语言程序与设计";
-    NSString *author = @"曹计昌 卢萍 李开";
-    NSString *year = @"2013";
-    NSString *organ = @"电子工业出版社";
-    NSString *address = @"华中科技大学";
-    NSInteger pagenum = 512;
+    NSString *title = self.titleText.text;
+    NSString *author = self.authorText.text;
+    NSString *year = self.yearText.text;;
+    NSString *organ = self.organText.text;;
+    NSString *address = self.addressText.text;;
+    NSInteger pagenum = self.pagenumText.text.intValue;
     FMDatabase *db = [DBManager sharedInstance].db;
     [db executeUpdate:@"insert into print values (?, ?, ?, ?, ?, ?);", title, author, year, organ, address, @(pagenum)];
 }
@@ -245,6 +256,7 @@
     {
         _modifyButton = [[UIButton alloc] init];
         [_modifyButton setTitle:@"修改" forState:UIControlStateNormal];
+        _modifyButton.backgroundColor = [UIColor grayColor];
         [_modifyButton addTarget:self action:@selector(modifyAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _modifyButton;

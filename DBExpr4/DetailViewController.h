@@ -12,7 +12,7 @@
 typedef NS_ENUM(NSUInteger, DetailType){
     DetailTypeNone,
     DetailTypeEdit,
-    
+    DetailTypeAdd
 };
 
 @interface DetailViewController : UIViewController

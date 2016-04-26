@@ -92,14 +92,8 @@ static NSString *identifer = @"identifer";
 
 - (void)addAction:(UIButton *)sender
 {
-    NSString *title = @"C语言程序与设计";
-    NSString *author = @"曹计昌 卢萍 李开";
-    NSString *year = @"2013";
-    NSString *organ = @"电子工业出版社";
-    NSString *address = @"华中科技大学";
-    NSInteger pagenum = 512;
-    FMDatabase *db = [DBManager sharedInstance].db;
-    [db executeUpdate:@"insert into print values (?, ?, ?, ?, ?, ?);", title, author, year, organ, address, @(pagenum)];
+    DetailViewController *controller = [[DetailViewController alloc] initWithModel:[[PrintModel alloc] init] type:DetailTypeAdd];
+    [self presentViewController:controller animated:NO completion:nil];
 }
 
 #pragma mark - UITableViewDelegate
