@@ -15,12 +15,13 @@
 
 static NSString *identifer = @"identifer";
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, DetailViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *modelArray;
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *addButton;
+@property (nonatomic, strong) UIButton *queryButton;
 
 @end
 
@@ -67,6 +68,17 @@ static NSString *identifer = @"identifer";
         make.height.mas_equalTo(50);
     }];
     
+    self.queryButton = [[UIButton alloc] init];
+    [self.queryButton setTitle:@"query" forState:UIControlStateNormal];
+    [self.queryButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.queryButton addTarget:self action:@selector(queryAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.queryButton];
+    [self.queryButton mas_makeConstraints:^(MASConstraintMaker *make){
+        make.right.equalTo(self.addButton.mas_left).offset(-15);
+        make.left.equalTo(self.resetButton.mas_right).offset(15);
+        make.bottom.equalTo(self.view).offset(-20);
+        make.height.mas_equalTo(50);
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -93,6 +105,14 @@ static NSString *identifer = @"identifer";
 - (void)addAction:(UIButton *)sender
 {
     DetailViewController *controller = [[DetailViewController alloc] initWithModel:[[PrintModel alloc] init] type:DetailTypeAdd];
+    controller.delegate = self;
+    [self presentViewController:controller animated:NO completion:nil];
+}
+
+- (void)queryAction:(UIButton *)sender
+{
+    DetailViewController *controller = [[DetailViewController alloc] initWithModel:[[PrintModel alloc] init] type:DetailTypeQuery];
+    controller.delegate = self;
     [self presentViewController:controller animated:NO completion:nil];
 }
 
@@ -101,6 +121,7 @@ static NSString *identifer = @"identifer";
 {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     DetailViewController *controller = [[DetailViewController alloc] initWithModel:(PrintModel *)self.modelArray[indexPath.row] type:DetailTypeEdit];
+    controller.delegate = self;
     [self presentViewController:controller animated:NO completion:nil];
 }
 
@@ -122,6 +143,24 @@ static NSString *identifer = @"identifer";
     return cell;
 }
 
+#pragma mark - DetailViewController
+- (void)successDeal:(DetailType)detailType
+{
+    if(detailType == DetailTypeAdd || detailType == DetailTypeEdit)
+    {
+        [self resetAction:nil];
+    }
+}
 
+- (void)successQuery:(FMResultSet *)resultSet
+{
+    NSMutableArray *tmpArray = [NSMutableArray array];
+    while ([resultSet next]) {
+        PrintModel *model = [[PrintModel alloc] initWithResultSet:resultSet];
+        [tmpArray addObject:model];
+    }
+    self.modelArray = [tmpArray copy];
+    [self.tableView reloadData];
+}
 
 @end
