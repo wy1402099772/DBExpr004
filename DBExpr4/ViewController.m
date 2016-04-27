@@ -12,6 +12,8 @@
 #import "PrintModel.h"
 #import "DetailViewController.h"
 #import "Masonry.h"
+#import "UIView+Toast.h"
+#import "PrintTableViewCell.h"
 
 static NSString *identifer = @"identifer";
 
@@ -33,7 +35,7 @@ static NSString *identifer = @"identifer";
     [self resetAction:nil];
     
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 10, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 100) style:UITableViewStylePlain];
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:identifer];
+    [self.tableView registerClass:[PrintTableViewCell class] forCellReuseIdentifier:identifer];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
@@ -45,9 +47,13 @@ static NSString *identifer = @"identifer";
     }];
     
     self.resetButton = [[UIButton alloc] init];
-    [self.resetButton setTitle:@"reset" forState:UIControlStateNormal];
+    [self.resetButton setImage:[UIImage imageNamed:@"image_refresh"] forState:UIControlStateNormal];
     [self.resetButton addTarget:self action:@selector(resetAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.resetButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    self.resetButton.layer.masksToBounds = YES;
+    self.resetButton.layer.cornerRadius = 10.0f;
+    self.resetButton.layer.borderColor = [UIColor purpleColor].CGColor;
+    self.resetButton.layer.borderWidth = 5.0f;
     [self.view addSubview:self.resetButton];
     [self.resetButton mas_makeConstraints:^(MASConstraintMaker *make){
         make.left.equalTo(self.view).offset(30);
@@ -57,10 +63,14 @@ static NSString *identifer = @"identifer";
     }];
     
     self.addButton = [[UIButton alloc] init];
-    [self.addButton setTitle:@"add" forState:UIControlStateNormal];
+    [self.addButton setImage:[UIImage imageNamed:@"image_add"] forState:UIControlStateNormal];
     [self.addButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.addButton addTarget:self action:@selector(addAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.addButton];
+    self.addButton.layer.masksToBounds = YES;
+    self.addButton.layer.cornerRadius = 10.0f;
+    self.addButton.layer.borderColor = [UIColor purpleColor].CGColor;
+    self.addButton.layer.borderWidth = 5.0f;
     [self.addButton mas_makeConstraints:^(MASConstraintMaker *make){
         make.right.equalTo(self.view).offset(-30);
         make.bottom.equalTo(self.view).offset(-20);
@@ -69,9 +79,13 @@ static NSString *identifer = @"identifer";
     }];
     
     self.queryButton = [[UIButton alloc] init];
-    [self.queryButton setTitle:@"query" forState:UIControlStateNormal];
+    [self.queryButton setImage:[UIImage imageNamed:@"image_find"] forState:UIControlStateNormal];
     [self.queryButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.queryButton addTarget:self action:@selector(queryAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.queryButton.layer.masksToBounds = YES;
+    self.queryButton.layer.cornerRadius = 10.0f;
+    self.queryButton.layer.borderColor = [UIColor purpleColor].CGColor;
+    self.queryButton.layer.borderWidth = 5.0f;
     [self.view addSubview:self.queryButton];
     [self.queryButton mas_makeConstraints:^(MASConstraintMaker *make){
         make.right.equalTo(self.addButton.mas_left).offset(-15);
@@ -125,20 +139,55 @@ static NSString *identifer = @"identifer";
     [self presentViewController:controller animated:NO completion:nil];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 90;
+}
+
 #pragma mark - UITableViewDataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return self.modelArray.count;
 }
 
-// Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
-// Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
+- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewRowAction *likeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"编辑" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        
+        DetailViewController *controller = [[DetailViewController alloc] initWithModel:(PrintModel *)self.modelArray[indexPath.row] type:DetailTypeEdit];
+        controller.delegate = self;
+        [self presentViewController:controller animated:NO completion:nil];
+    }];
+    
+    UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
 
+        PrintTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        PrintModel *model = cell.model;
+        NSMutableArray *muta = [NSMutableArray arrayWithArray:self.modelArray];
+        [muta removeObject:model];
+        self.modelArray = [muta copy];
+        FMDatabase *db = [DBManager sharedInstance].db;
+        BOOL result =  [db executeUpdate:@"delete from print where title = ?;", cell.model.title];
+        if(!result)
+        {
+            [self.view makeToast:@"删除操作出现了一些错误，操作失败" duration:2.0f position:CSToastPositionBottom];
+        }
+        else
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    }];
+    
+    return @[deleteAction, likeAction];
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:identifer];
+    PrintTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:identifer];
     PrintModel *model = (PrintModel *)self.modelArray[indexPath.row];
-    cell.textLabel.text = model.title;
+    [cell loadModel:model];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }

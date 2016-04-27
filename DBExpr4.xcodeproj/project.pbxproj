@@ -18,6 +18,7 @@
 		93AC85D71CCDBC1E006B37DE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93AC85D51CCDBC1E006B37DE /* LaunchScreen.storyboard */; };
 		93AC85E21CCDBC1F006B37DE /* DBExpr4Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC85E11CCDBC1F006B37DE /* DBExpr4Tests.m */; };
 		93AC85ED1CCDBC1F006B37DE /* DBExpr4UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC85EC1CCDBC1F006B37DE /* DBExpr4UITests.m */; };
+		93B121AE1CD0F9720048563D /* PrintTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B121AD1CD0F9720048563D /* PrintTableViewCell.m */; };
 		CF1611B31294813D8BECA0CF /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A8EF9661C3486B272D69A33 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,8 @@
 		93AC85E81CCDBC1F006B37DE /* DBExpr4UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DBExpr4UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		93AC85EC1CCDBC1F006B37DE /* DBExpr4UITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DBExpr4UITests.m; sourceTree = "<group>"; };
 		93AC85EE1CCDBC1F006B37DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93B121AC1CD0F9720048563D /* PrintTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrintTableViewCell.h; sourceTree = "<group>"; };
+		93B121AD1CD0F9720048563D /* PrintTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrintTableViewCell.m; sourceTree = "<group>"; };
 		C6A234E19208062B36B643F5 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +147,8 @@
 				9370765A1CCDDD3400806FC7 /* PrintModel.m */,
 				937076621CCEFC5C00806FC7 /* DetailViewController.h */,
 				937076631CCEFC5C00806FC7 /* DetailViewController.m */,
+				93B121AC1CD0F9720048563D /* PrintTableViewCell.h */,
+				93B121AD1CD0F9720048563D /* PrintTableViewCell.m */,
 				93AC85D01CCDBC1E006B37DE /* Main.storyboard */,
 				93AC85D31CCDBC1E006B37DE /* Assets.xcassets */,
 				93AC85D51CCDBC1E006B37DE /* LaunchScreen.storyboard */,
@@ -365,6 +370,7 @@
 				93AC85CC1CCDBC1E006B37DE /* AppDelegate.m in Sources */,
 				93AC85C91CCDBC1E006B37DE /* main.m in Sources */,
 				937076611CCE3E9A00806FC7 /* DBManager.m in Sources */,
+				93B121AE1CD0F9720048563D /* PrintTableViewCell.m in Sources */,
 				937076641CCEFC5C00806FC7 /* DetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

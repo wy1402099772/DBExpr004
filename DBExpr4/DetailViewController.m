@@ -602,9 +602,11 @@
     if(!_cancelButton)
     {
         _cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
-        [_cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-        _cancelButton.backgroundColor = [UIColor grayColor];
+        [_cancelButton setImage:[UIImage imageNamed:@"image_cancel"] forState:UIControlStateNormal];
+        _cancelButton.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.1];
         [_cancelButton addTarget:self action:@selector(cancelAction:) forControlEvents:UIControlEventTouchUpInside];
+        _cancelButton.layer.masksToBounds = YES;
+        _cancelButton.layer.cornerRadius = 10.0f;
     }
     return _cancelButton;
 }
@@ -617,24 +619,26 @@
         NSString *complete;
         switch (self.detailType) {
             case DetailTypeNone: {
-                complete = @"修改";
+                complete = @"image_modify";
                 break;
             }
             case DetailTypeEdit: {
-                complete = @"修改";
+                complete = @"image_modify";
                 break;
             }
             case DetailTypeAdd: {
-                complete = @"添加";
+                complete = @"image_add";
                 break;
             }
             case DetailTypeQuery: {
-                complete = @"查询";
+                complete = @"image_find";
                 break;
             }
         }
-        [_modifyButton setTitle:complete forState:UIControlStateNormal];
-        _modifyButton.backgroundColor = [UIColor grayColor];
+        [_modifyButton setImage:[UIImage imageNamed:complete] forState:UIControlStateNormal];
+        _modifyButton.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.1];
+        _modifyButton.layer.masksToBounds = YES;
+        _modifyButton.layer.cornerRadius = 10.0f;
         [_modifyButton addTarget:self action:@selector(modifyAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _modifyButton;
