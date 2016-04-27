@@ -39,6 +39,12 @@
 
 - (void)configureView
 {
+    self.backgroundColor = [UIColor colorWithRed:0.637 green:0.788 blue:1.000 alpha:1.000];
+    self.layer.masksToBounds = YES;
+    self.layer.cornerRadius = 20.0f;
+    self.layer.borderColor = [UIColor purpleColor].CGColor;
+    self.layer.borderWidth = 1.0f;
+    
     [self.contentView addSubview:self.titleLabel];
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make){
         make.left.equalTo(self.contentView).offset(10);

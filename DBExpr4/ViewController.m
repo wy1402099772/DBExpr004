@@ -34,16 +34,22 @@ static NSString *identifer = @"identifer";
     
     [self resetAction:nil];
     
+    self.view.backgroundColor = [UIColor colorWithRed:0.056 green:0.997 blue:0.915 alpha:0.800];
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 10, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 100) style:UITableViewStylePlain];
     [self.tableView registerClass:[PrintTableViewCell class] forCellReuseIdentifier:identifer];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.layer.masksToBounds = YES;
+    self.tableView.layer.cornerRadius = 20.0f;
+    self.tableView.layer.borderColor = [UIColor colorWithRed:0.365 green:1.000 blue:0.925 alpha:1.000].CGColor;
+    self.tableView.layer.borderWidth = 1.0f;
+    self.tableView.backgroundColor = [UIColor colorWithRed:0.073 green:0.744 blue:1.000 alpha:1.000];
     [self.view addSubview:self.tableView];
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make){
         make.top.equalTo(self.view).offset(15);
         make.bottom.equalTo(self.view).offset(-90);
-        make.left.equalTo(self.view);
-        make.right.equalTo(self.view);
+        make.left.equalTo(self.view).offset(5);
+        make.right.equalTo(self.view).offset(-5);
     }];
     
     self.resetButton = [[UIButton alloc] init];

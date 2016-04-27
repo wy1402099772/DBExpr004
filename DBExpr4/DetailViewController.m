@@ -12,9 +12,10 @@
 #import "DBManager.h"
 #import "UIView+Toast.h"
 
-@interface DetailViewController ()
+@interface DetailViewController () <UITextFieldDelegate>
 {
     BOOL isOr;
+    UITextField *activeText;
 }
 
 @property (nonatomic, strong) PrintModel *model;
@@ -53,6 +54,7 @@
 @property (nonatomic, strong) UITextField *maxPage;
 
 @property (nonatomic, strong) UISwitch *orAndSwitch;
+@property (nonatomic, strong) UIView *keyboardView;
 
 @end
 
@@ -73,6 +75,7 @@
     // Do any additional setup after loading the view.
     
     [self configureView];
+    [self configureKeyboardNotification];
     [self fillData];
     
 }
@@ -82,15 +85,59 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)configureKeyboardNotification
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+}
+
+- (void)removeNotification
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
+}
+
 - (void)configureView
 {
-    self.view.backgroundColor = [UIColor whiteColor];
+    [self.view setUserInteractionEnabled:YES];
+    UITapGestureRecognizer *pan = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    [self.view addGestureRecognizer:pan];
+    
+    switch (self.detailType) {
+        case DetailTypeNone: {
+            self.view.backgroundColor = [UIColor whiteColor];
+            break;
+        }
+        case DetailTypeEdit: {
+            self.view.backgroundColor = [UIColor colorWithRed:0.637 green:0.788 blue:1.000 alpha:1.000];
+            break;
+        }
+        case DetailTypeAdd: {
+            self.view.backgroundColor = [UIColor colorWithRed:0.056 green:0.997 blue:0.915 alpha:0.800];
+            break;
+        }
+        case DetailTypeQuery: {
+            self.view.backgroundColor = [UIColor colorWithRed:0.073 green:0.744 blue:1.000 alpha:1.000];
+            break;
+        }
+    }
+    [self.view addSubview:self.keyboardView];
+    [self.keyboardView mas_makeConstraints:^(MASConstraintMaker *make){
+        make.bottom.equalTo(self.view);
+        make.left.equalTo(self.view);
+        make.right.equalTo(self.view);
+        make.height.mas_equalTo(0);
+    }];
     
     [self.view addSubview:self.bottomView];
     [self.bottomView mas_makeConstraints:^(MASConstraintMaker *make){
         make.left.equalTo(self.view);
         make.right.equalTo(self.view);
-        make.bottom.equalTo(self.view);
+        make.bottom.equalTo(self.keyboardView.mas_top);
         make.height.mas_equalTo(100);
     }];
     
@@ -335,6 +382,7 @@
 #pragma mark - action
 - (void)cancelAction:(UIButton *)sender
 {
+    [self removeNotification];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -356,6 +404,7 @@
             {
                 [self.delegate successDeal:self.detailType];
             }
+            [self removeNotification];
             [self dismissViewControllerAnimated:YES completion:nil];
         }
     }
@@ -367,6 +416,7 @@
             if(result)
             {
                 [self.delegate successDeal:self.detailType];
+                [self removeNotification];
                 [self dismissViewControllerAnimated:YES completion:nil];
             }
         }
@@ -380,6 +430,7 @@
             if(result1 && result2)
             {
                 [self.delegate successDeal:self.detailType];
+                [self removeNotification];
                 [self dismissViewControllerAnimated:YES completion:nil];
             }
         }
@@ -549,6 +600,7 @@
         {
             if(self.delegate && [self.delegate respondsToSelector:@selector(successQuery:)])
                 [self.delegate successQuery:resultSet];
+            [self removeNotification];
             [self dismissViewControllerAnimated:YES completion:nil];
         }
             
@@ -594,6 +646,84 @@
             message = @"模糊查询";
     }
     [self.view makeToast:message duration:1.0f position:CSToastPositionBottom];
+}
+
+- (void)tapAction:(UIPanGestureRecognizer *)sender
+{
+    [activeText resignFirstResponder];
+}
+
+#pragma mark - KeyboardNotification
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+    NSDictionary *info  = notification.userInfo;
+    NSValue      *value = info[UIKeyboardFrameEndUserInfoKey];
+    
+    CGRect rawFrame      = [value CGRectValue];
+    CGRect keyboardFrame = [self.view convertRect:rawFrame fromView:nil];
+    CGFloat heightOfkeyboard = keyboardFrame.size.height;
+    
+    [self.keyboardView mas_updateConstraints:^(MASConstraintMaker *make){
+        make.height.mas_equalTo(heightOfkeyboard);
+    }];
+    [UIView animateWithDuration:0.3 animations:^{
+        [self.view layoutIfNeeded];
+    }];
+}
+
+- (void)keyboardDidShow:(NSNotification *)notification
+{
+    
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    [self.keyboardView mas_updateConstraints:^(MASConstraintMaker *make){
+        make.height.mas_equalTo(0);
+    }];
+    [UIView animateWithDuration:0.3 animations:^{
+        [self.view layoutIfNeeded];
+    }];
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification
+{
+    
+}
+
+#pragma mark - UITextFieldDelegate
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    activeText = textField;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(self.titleText == textField)
+    {
+        [self.authorText becomeFirstResponder];
+    }
+    else if (self.authorText == textField)
+    {
+        [self.yearText becomeFirstResponder];
+    }
+    else if(self.yearText == textField)
+    {
+        [self.organText becomeFirstResponder];
+    }
+    else if(self.organText == textField)
+    {
+        [self.addressText becomeFirstResponder];
+    }
+    else if (self.addressText == textField)
+    {
+        [self.pagenumText becomeFirstResponder];
+    }
+    else if(self.pagenumText == textField)
+    {
+        [textField resignFirstResponder];
+    }
+    return YES;
 }
 
 #pragma mark - getter
@@ -651,6 +781,7 @@
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text = @"书名：";
         [_titleLabel setFont:[UIFont fontWithName:@"AppleSDGothicNeo-SemiBold" size:30]];
+        _titleLabel.textColor = [UIColor colorWithRed:0.851 green:0.310 blue:0.276 alpha:1.000];
     }
     return _titleLabel;
 }
@@ -661,6 +792,8 @@
     {
         _titleText = [[UITextField alloc] init];
         _titleText.borderStyle = UITextBorderStyleBezel;
+        _titleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _titleText.delegate = self;
     }
     return _titleText;
 }
@@ -673,6 +806,7 @@
         _authorLabel = [[UILabel alloc] init];
         _authorLabel.text = @"作者：";
         [_authorLabel setFont:[UIFont fontWithName:@"AppleSDGothicNeo-SemiBold" size:30]];
+        _authorLabel.textColor = [UIColor colorWithRed:0.851 green:0.310 blue:0.276 alpha:1.000];
     }
     return _authorLabel;
 }
@@ -683,6 +817,8 @@
     {
         _authorText = [[UITextField alloc] init];
         _authorText.borderStyle = UITextBorderStyleBezel;
+        _authorText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _authorText.delegate = self;
     }
     return _authorText;
 }
@@ -704,6 +840,8 @@
     {
         _yearText = [[UITextField alloc] init];
         _yearText.borderStyle = UITextBorderStyleBezel;
+        _yearText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _yearText.delegate = self;
     }
     return _yearText;
 }
@@ -726,6 +864,8 @@
     {
         _organText = [[UITextField alloc] init];
         _organText.borderStyle = UITextBorderStyleBezel;
+        _organText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];\
+        _organText.delegate = self;
     }
     return _organText;
 }
@@ -737,6 +877,7 @@
         _addressLabel = [[UILabel alloc] init];
         _addressLabel.text = @"地址：";
         [_addressLabel setFont:[UIFont fontWithName:@"AppleSDGothicNeo-SemiBold" size:30]];
+        _titleText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
     }
     return _addressLabel;
 }
@@ -747,6 +888,8 @@
     {
         _addressText = [[UITextField alloc] init];
         _addressText.borderStyle = UITextBorderStyleBezel;
+        _addressText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _addressText.delegate = self;
     }
     return _addressText;
 }
@@ -769,6 +912,8 @@
     {
         _pagenumText = [[UITextField alloc] init];
         _pagenumText.borderStyle = UITextBorderStyleBezel;
+        _pagenumText.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _pagenumText.delegate = self;
     }
     return _pagenumText;
 }
@@ -881,6 +1026,8 @@
     {
         _minYear = [[UITextField alloc] init];
         _minYear.borderStyle = UITextBorderStyleBezel;
+        _minYear.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _minYear.placeholder = @"min";
     }
     return _minYear;
 }
@@ -891,6 +1038,8 @@
     {
         _maxYear = [[UITextField alloc] init];
         _maxYear.borderStyle = UITextBorderStyleBezel;
+        _maxYear.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _maxYear.placeholder = @"max";
     }
     return _maxYear;
 }
@@ -901,6 +1050,8 @@
     {
         _minPage = [[UITextField alloc] init];
         _minPage.borderStyle = UITextBorderStyleBezel;
+        _minPage.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _minPage.placeholder = @"min";
     }
     return _minPage;
 }
@@ -910,6 +1061,8 @@
     {
         _maxPage = [[UITextField alloc] init];
         _maxPage.borderStyle = UITextBorderStyleBezel;
+        _maxPage.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
+        _maxPage.placeholder = @"max";
     }
     return _maxPage;
 }
@@ -923,6 +1076,15 @@
         [_orAndSwitch addTarget:self action:@selector(switchAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _orAndSwitch;
+}
+
+- (UIView *)keyboardView
+{
+    if(!_keyboardView)
+    {
+        _keyboardView = [[UIView alloc] init];
+    }
+    return _keyboardView;
 }
 
 @end
