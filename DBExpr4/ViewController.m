@@ -64,7 +64,7 @@ static NSString *identifer = @"identifer";
     [self.resetButton mas_makeConstraints:^(MASConstraintMaker *make){
         make.left.equalTo(self.view).offset(30);
         make.bottom.equalTo(self.view).offset(-20);
-        make.width.mas_equalTo(100);
+//        make.width.mas_equalTo(100);
         make.height.mas_equalTo(50);
     }];
     
@@ -80,7 +80,7 @@ static NSString *identifer = @"identifer";
     [self.addButton mas_makeConstraints:^(MASConstraintMaker *make){
         make.right.equalTo(self.view).offset(-30);
         make.bottom.equalTo(self.view).offset(-20);
-        make.width.mas_equalTo(100);
+        make.width.equalTo(self.resetButton);
         make.height.mas_equalTo(50);
     }];
     
@@ -98,6 +98,7 @@ static NSString *identifer = @"identifer";
         make.left.equalTo(self.resetButton.mas_right).offset(15);
         make.bottom.equalTo(self.view).offset(-20);
         make.height.mas_equalTo(50);
+        make.width.equalTo(self.resetButton);
     }];
 }
 
