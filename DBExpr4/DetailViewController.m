@@ -634,9 +634,9 @@
     {
         isOr = sender.isOn;
         if(sender.isOn)
-            message = @"切换到 与 模式";
-        else
             message = @"切换到 或 模式";
+        else
+            message = @"切换到 与 模式";
     }
     else
     {
