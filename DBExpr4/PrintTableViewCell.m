@@ -10,6 +10,9 @@
 #import "Masonry.h"
 
 @interface PrintTableViewCell ()
+{
+    NSInteger ipadFactor;
+}
 
 @property (nonatomic, strong) UILabel *authorLabel;
 @property (nonatomic, strong) UILabel *organLabel;
@@ -24,7 +27,12 @@
 {
     if(self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])
     {
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            ipadFactor = 2;
+        else
+            ipadFactor = 1;
         [self configureView];
+        
     }
     return self;
 }
@@ -50,7 +58,7 @@
         make.left.equalTo(self.contentView).offset(10);
         make.top.equalTo(self.contentView).offset(10);
         make.right.equalTo(self.contentView).offset(10);
-        make.height.mas_equalTo(40);
+        make.height.mas_equalTo(40 * ipadFactor);
     }];
     
     [self.contentView addSubview:self.authorLabel];
@@ -76,7 +84,7 @@
     if(!_titleLabel)
     {
         _titleLabel = [[UILabel alloc] init];
-        _titleLabel.font = [UIFont fontWithName:@"AppleSDGothicNeo-SemiBold" size:30];
+        _titleLabel.font = [UIFont fontWithName:@"AppleSDGothicNeo-SemiBold" size:30 * ipadFactor];
         _titleLabel.textColor = [UIColor purpleColor];
     }
     return _titleLabel;

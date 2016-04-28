@@ -394,6 +394,11 @@
     NSString *organ = self.organText.text;;
     NSString *address = self.addressText.text;;
     NSString *pagenum = self.pagenumText.text;
+    if((DetailTypeAdd == self.detailType || DetailTypeEdit == self.detailType) && !title.length && !author.length)
+    {
+        [self.view makeToast:@"书名与作者不能同时为空" duration:1.0f position:CSToastPositionCenter];
+        return;
+    }
     FMDatabase *db = [DBManager sharedInstance].db;
     if(DetailTypeAdd == self.detailType)
     {
@@ -645,7 +650,7 @@
         else
             message = @"模糊查询";
     }
-    [self.view makeToast:message duration:1.0f position:CSToastPositionBottom];
+    [self.view makeToast:message duration:1.0f position:CSToastPositionCenter];
 }
 
 - (void)tapAction:(UIPanGestureRecognizer *)sender

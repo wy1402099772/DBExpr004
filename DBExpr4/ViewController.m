@@ -148,6 +148,8 @@ static NSString *identifer = @"identifer";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        return 180;
     return 90;
 }
 
@@ -181,7 +183,7 @@ static NSString *identifer = @"identifer";
         BOOL result =  [db executeUpdate:@"delete from print where title = ?;", cell.model.title];
         if(!result)
         {
-            [self.view makeToast:@"删除操作出现了一些错误，操作失败" duration:2.0f position:CSToastPositionBottom];
+            [self.view makeToast:@"删除操作出现了一些错误，操作失败" duration:2.0f position:CSToastPositionCenter];
         }
         else
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
